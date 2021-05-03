@@ -18,7 +18,6 @@ public class ApiService {
         String externalUrl = "https://restcountries.eu/rest/v2/name/" + countryName;
 
         String country = restTemplate.getForEntity(externalUrl, String.class).getBody();
-
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node = mapper.readTree(country).get(0);
         String flag = "{\"flag\": \"" + node.get("flag").asText() + "\"}";
