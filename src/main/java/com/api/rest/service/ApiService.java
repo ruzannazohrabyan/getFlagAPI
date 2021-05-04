@@ -3,25 +3,25 @@ package com.api.rest.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Service
 public class ApiService {
     private final RestTemplate restTemplate;
-
     public ApiService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
-    public JsonNode getFlag(String countryName) throws JsonProcessingException {
+    public ResponseEntity<JsonNode> getFlag(String countryName) throws JsonProcessingException {
         String externalUrl = "https://restcountries.eu/rest/v2/name/" + countryName;
 
-        String country = restTemplate.getForEntity(externalUrl, String.class).getBody();
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode node = mapper.readTree(country).get(0);
-        String flag = "{\"flag\": \"" + node.get("flag").asText() + "\"}";
-        return mapper.readTree(flag);
+        JsonNode country = restTemplate.getForEntity(externalUrl, JsonNode.class).getBody();
+        JsonNode node = country.get(0).get("flag");
+        String flag = "{\"flag\": " + node + "}";
+        return new ResponseEntity<>(new ObjectMapper().readTree(flag), HttpStatus.OK);
     }
 
 }
